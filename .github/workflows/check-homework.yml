@@ -36,7 +36,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: cpp-for-yourself/homework-definitions
-        ref: leave-only-homework
         path: definitions
     - name: Checkout wiki
       uses: actions/checkout@v2
