@@ -19,7 +19,7 @@ jobs:
         git commit --allow-empty -m "Add progress bar"
         git push
 
-  run_tests_and_upload_result:
+  run_tests:
     needs: upload_progress_bar_to_wiki
     runs-on: ubuntu-latest
     steps:
@@ -58,13 +58,31 @@ jobs:
         cd checker
         pipenv install
         pipenv run python3 check_homework.py -v -i homework.yml -o results.md
+    - name: Upload result md file
+      uses: actions/upload-artifact@v2
+      with:
+        name: homework_result
+        path: checker/results.md
+
+  upload_results_to_wiki:
+    needs: run_tests
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: ${{ github.repository }}.wiki
+        path: wiki
+    - name: Download result md file
+      uses: actions/download-artifact@v2
+      with:
+        name: homework_result
     - name: Upload result to wiki
       run: |
-        mv checker/results.md wiki/Home.md
+        mv results.md wiki/Home.md
         cd wiki
         git config user.name homework-bot
         git config user.email homework-bot@github.com
         git add .
         git commit -m "Update results" --allow-empty
         git push
-        
+          
