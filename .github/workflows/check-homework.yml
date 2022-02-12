@@ -1,0 +1,70 @@
+name: CI
+
+on: [push]
+
+jobs:
+  upload_progress_bar_to_wiki:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: ${{ github.repository }}.wiki
+        path: wiki
+    - run: |
+        cd wiki
+        printf '%s\n%s\n' "## Tests are running! Please wait!" "![](https://i.gifer.com/origin/82/82a1ed531e333926a8ca2a00c277e0d1.gif)" > Home.md
+        git config user.name homework-bot
+        git config user.email homework-bot@github.com
+        git add .
+        git commit --allow-empty -m "Add progress bar"
+        git push
+
+  run_tests_and_upload_result:
+    needs: upload_progress_bar_to_wiki
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout this homework
+      uses: actions/checkout@v2
+      with:
+        path: homework
+    - name: Checkout homework checker
+      uses: actions/checkout@v2
+      with:
+        repository: niosus/homework_checker
+        path: checker
+    - name: Checkout homework definitions
+      uses: actions/checkout@v2
+      with:
+        repository: cpp-for-yourself/homework-definitions
+        path: definitions
+    - name: Checkout wiki
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ github.repository }}.wiki
+        path: wiki
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - name: Install prerequisites
+      run: |
+        sudo apt install -y libgtest-dev
+        python -m pip install --upgrade pip pipenv ruamel.yaml schema
+    - name: Run tests in pipenv
+      run: |
+        cp definitions/homework.yml checker/
+        cp -r homework/homeworks checker/
+        cd checker
+        pipenv install
+        pipenv run python3 check_homework.py -v -i homework.yml -o results.md
+    - name: Upload result to wiki
+      run: |
+        mv checker/results.md wiki/Home.md
+        cd wiki
+        git config user.name homework-bot
+        git config user.email homework-bot@github.com
+        git add .
+        git commit -m "Update results" --allow-empty
+        git push
+        
