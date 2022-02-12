@@ -34,9 +34,9 @@ jobs:
         path: checker
     - name: Checkout homework definitions
       uses: actions/checkout@v2
-      ref: leave-only-homework
       with:
         repository: cpp-for-yourself/homework-definitions
+        ref: leave-only-homework
         path: definitions
     - name: Checkout wiki
       uses: actions/checkout@v2
