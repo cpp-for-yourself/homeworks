@@ -34,6 +34,7 @@ jobs:
         path: checker
     - name: Checkout homework definitions
       uses: actions/checkout@v2
+      ref: leave-only-homework
       with:
         repository: cpp-for-yourself/homework-definitions
         path: definitions
@@ -53,10 +54,11 @@ jobs:
         python -m pip install --upgrade pip pipenv ruamel.yaml schema
     - name: Run tests in pipenv
       run: |
-        cp -r definitions/homework checker/
+        cp definitions/homework.yml checker/
+        cp -r homework/homeworks checker/
         cd checker
         pipenv install
-        pipenv run python3 check_homework.py -v -i homework/homework.yml -o results.md
+        pipenv run python3 check_homework.py -v -i homework.yml -o results.md
     - name: Upload result to wiki
       run: |
         mv checker/results.md wiki/Home.md
