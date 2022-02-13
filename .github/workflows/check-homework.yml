@@ -109,7 +109,7 @@ jobs:
         body: |
           ```
           Author: ${{ github.actor }}
-          Branch: ${{ github.ref_name }}
+          Branch: ${{ github.head_ref }}
           Commit: ${{ github.sha }}
           ```
           ${{ steps.template.outputs.result }}
