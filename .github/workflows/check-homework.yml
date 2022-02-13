@@ -1,26 +1,48 @@
 name: CI
 
-on: [push]
+on: [pull_request]
 
 jobs:
-  upload_progress_bar_to_wiki:
+  add_progress_bar_comment:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Find Comment
+      uses: peter-evans/find-comment@v1
+      id: fc
       with:
-        repository: ${{ github.repository }}.wiki
-        path: wiki
-    - run: |
-        cd wiki
-        printf '%s\n%s\n' "## Tests are running! Please wait!" "![](https://i.gifer.com/origin/82/82a1ed531e333926a8ca2a00c277e0d1.gif)" > Home.md
-        git config user.name homework-bot
-        git config user.email homework-bot@github.com
-        git add .
-        git commit --allow-empty -m "Add progress bar"
-        git push
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: With ❤️ from Homework Bot 🤖
+    - name: Create comment
+      if: steps.fc.outputs.comment-id == ''
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ## Tests are running! Please wait!
+          
+          ![Progress gif](https://cdn.dribbble.com/users/2015153/screenshots/6592242/progess-bar2.gif)
 
-  run_tests_and_upload_result:
-    needs: upload_progress_bar_to_wiki
+          > Progress gif from https://dribbble.com/shots/6592242-Please-wait-Animation#
+          
+          With ❤️ from Homework Bot 🤖
+    - name: Update comment
+      if: steps.fc.outputs.comment-id != ''
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        edit-mode: replace
+        body: |
+          ## Tests are running! Please wait!
+          
+          ![Progress gif](https://cdn.dribbble.com/users/2015153/screenshots/6592242/progess-bar2.gif)
+          
+          > Progress gif from https://dribbble.com/shots/6592242-Please-wait-Animation#
+
+          With ❤️ from Homework Bot 🤖
+        
+  check_homework:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout this homework
@@ -37,11 +59,6 @@ jobs:
       with:
         repository: cpp-for-yourself/homework-definitions
         path: definitions
-    - name: Checkout wiki
-      uses: actions/checkout@v2
-      with:
-        repository: ${{ github.repository }}.wiki
-        path: wiki
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -58,13 +75,101 @@ jobs:
         cd checker
         pipenv install
         pipenv run python3 check_homework.py -v -i homework.yml -o results.md
+    - name: Upload result md file
+      uses: actions/upload-artifact@v2
+      with:
+        name: homework_result
+        path: checker/results.md
+
+  upload_results_as_comment:
+    needs: check_homework
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download result md file
+      uses: actions/download-artifact@v2
+      with:
+        name: homework_result
+    - name: Render template
+      id: template
+      uses: chuhlomin/render-template@v1.2
+      with:
+        template: results.md
+    - name: Find Comment
+      uses: peter-evans/find-comment@v1
+      id: fc
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: With ❤️ from Homework Bot 🤖
+    - name: Update comment with test results
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: ${{ steps.template.outputs.result }}
+        edit-mode: replace
+
+  upload_results_to_wiki:
+    needs: check_homework
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download result md file
+      uses: actions/download-artifact@v2
+      with:
+        name: homework_result
+    - name: Find Comment
+      uses: peter-evans/find-comment@v1
+      id: fc
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: With 💙 from Homework Bot 🤖
+    - name: Checkout wiki
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ github.repository }}.wiki
+        path: wiki
     - name: Upload result to wiki
       run: |
-        mv checker/results.md wiki/Home.md
+        echo \`\`\` > wiki/Home.md
+        echo Author: ${{ github.actor }} >> wiki/Home.md
+        echo Branch: ${{ github.head_ref }} >> wiki/Home.md
+        echo Commit: ${{ github.sha }} >> wiki/Home.md
+        echo \`\`\` >> wiki/Home.md
+        cat results.md >> wiki/Home.md
         cd wiki
         git config user.name homework-bot
         git config user.email homework-bot@github.com
         git add .
         git commit -m "Update results" --allow-empty
         git push
-        
+    - name: Comment on wiki access failure
+      uses: peter-evans/create-or-update-comment@v1
+      if: failure()
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          # ‼️ Wiki is empty ‼️
+          
+          To fix this error you will have to perform the following actions once:
+          1. Create _any_ (even empty) page in the wiki by clicking this link: ${{ github.server_url }}/${{ github.repository }}/wiki/_new
+          2. Rerun the actions by clicking the <kbd>🔄 Re-run all jobs</kbd> button here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          
+          ---
+          
+          With 💙 from Homework Bot 🤖
+        edit-mode: replace
+    - name: Comment on wiki access success
+      uses: peter-evans/create-or-update-comment@v1
+      if: success()
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          # ✅ Wiki is available
+
+          Check it out at: ${{ github.server_url }}/${{ github.repository }}/wiki
+          
+          With 💙 from Homework Bot 🤖
+        edit-mode: replace
