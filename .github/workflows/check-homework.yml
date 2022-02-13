@@ -106,13 +106,7 @@ jobs:
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
         issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          ```
-          Author: ${{ github.actor }}
-          Branch: ${{ github.head_ref }}
-          Commit: ${{ github.sha }}
-          ```
-          ${{ steps.template.outputs.result }}
+        body: ${{ steps.template.outputs.result }}
         edit-mode: replace
 
   upload_results_to_wiki:
@@ -137,7 +131,12 @@ jobs:
         path: wiki
     - name: Upload result to wiki
       run: |
-        mv results.md wiki/Home.md
+        echo \`\`\` > wiki/Home.md
+        echo Author: ${{ github.actor }} >> wiki/Home.md
+        echo Branch: ${{ github.head_ref }} >> wiki/Home.md
+        echo Commit: ${{ github.sha }} >> wiki/Home.md
+        echo \`\`\` >> wiki/Home.md
+        cat results.md >> wiki/Home.md
         cd wiki
         git config user.name homework-bot
         git config user.email homework-bot@github.com
