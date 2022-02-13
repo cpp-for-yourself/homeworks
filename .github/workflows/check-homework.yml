@@ -3,6 +3,18 @@ name: CI
 on: [push]
 
 jobs:
+  check_wiki:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout wiki
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ github.repository }}.wiki
+        path: wiki
+    - name: Create wiki
+      if: failure()
+      run: curl -u ${{ github.repository_owner }}:${{ github.token }} https://api.github.com/user/repos -d '{"name":"${{ github.event.repository.name }}.wiki"}'
+
   upload_progress_bar_to_wiki:
     runs-on: ubuntu-latest
     steps:
