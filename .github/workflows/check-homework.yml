@@ -49,11 +49,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: homework
-    - name: Checkout homework checker
-      uses: actions/checkout@v2
-      with:
-        repository: niosus/homework_checker
-        path: checker
     - name: Checkout homework definitions
       uses: actions/checkout@v2
       with:
@@ -67,14 +62,14 @@ jobs:
     - name: Install prerequisites
       run: |
         sudo apt install -y libgtest-dev
-        python -m pip install --upgrade pip pipenv ruamel.yaml schema
-    - name: Run tests in pipenv
+        python -m pip install --upgrade pip pipenv ruamel.yaml schema homework-checker
+    - name: Run tests
       run: |
+        mkdir checker
         cp definitions/homework.yml checker/
         cp -r homework/homeworks checker/
         cd checker
-        pipenv install
-        pipenv run python3 check_homework.py -v -i homework.yml -o results.md
+        check_homework -v -i homework.yml -o results.md
     - name: Upload result md file
       uses: actions/upload-artifact@v2
       with:
