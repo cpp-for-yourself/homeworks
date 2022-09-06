@@ -5,6 +5,12 @@ To use it, click the <kbd>Use this template</kbd> button at the top of the page.
 This will create a repository with all the necessary pipelines set up to
 check your homework submissions.
 
+## Where to find homeworks
+The actual tasks you would have to do are found in the 
+[supplementary-materials](https://github.com/cpp-for-yourself/supplementary-materials) 
+repository. Just check the readme of that project to get started. 
+I will additionally announce most homeworks in separate videos on the YouTube channel.
+
 ## How to submit a homework
 
 ### Easy start
