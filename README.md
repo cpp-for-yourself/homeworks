@@ -18,8 +18,8 @@ In order to start, you can instantly create a PR to fix a failing test (see the
 Wiki of this project to see which test is failing). Just copy the contents of
 the `commands.sh` in the `example_task` into the `commands.sh` in the
 `example_task_copy` folder, commit it to a new branch an open a PR to your new
-repository's `main` branch. If this is unclear than see a video from the course
-about it.
+repository's `main` branch. If this is unclear then see 
+[a video from the course](https://youtu.be/Nl0u04XgxGQ) about it.
 
 ### More information
 Homeworks must all be under `homeworks` folder. You can see an example homework
