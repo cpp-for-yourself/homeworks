@@ -6,3 +6,5 @@ jobs:
   run_all_tests:
     name: Run all tests
     uses: cpp-for-yourself/ci-jobs/.github/workflows/check-homework.yml@reusable-job
+    with:
+      homework-definitions-branch: main
