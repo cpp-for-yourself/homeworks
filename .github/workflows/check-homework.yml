@@ -5,4 +5,4 @@ on: [pull_request]
 jobs:
   run_all_tests:
     name: Run all tests
-    uses: cpp-for-yourself/ci-jobs/.github/workflows/check_homework.yml@reusable-job
+    uses: cpp-for-yourself/ci-jobs/.github/workflows/check-homework.yml@reusable-job
