@@ -5,8 +5,8 @@ on: [pull_request]
 jobs:
   run_all_tests:
     name: Run all tests
-    uses: cpp-for-yourself/ci-jobs/.github/workflows/check-homework.yml@add-checker-version-input
+    uses: cpp-for-yourself/ci-jobs/.github/workflows/check-homework.yml@main
     with:
       homework-definitions-branch: main
-      ci-jobs-branch: add-checker-version-input
+      ci-jobs-branch: main
       homework-checker-version: 1.2.0
