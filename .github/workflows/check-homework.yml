@@ -7,4 +7,5 @@ jobs:
     name: Run all tests
     uses: cpp-for-yourself/ci-jobs/.github/workflows/check-homework.yml@main
     with:
-      homework-definitions-branch: main
+      homework-definitions-branch: add-checker-version-input
+      homework-checker-version: 1.2.0
