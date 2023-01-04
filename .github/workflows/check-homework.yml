@@ -5,8 +5,6 @@ on: [pull_request]
 jobs:
   run_all_tests:
     name: Run all tests
-    uses: cpp-for-yourself/ci-jobs/.github/workflows/check-homework.yml@main
+    uses: cpp-for-yourself/ci-jobs/.github/workflows/check-homework.yml@simplify
     with:
       homework-definitions-branch: main
-      ci-jobs-branch: main
-      homework-checker-version: 2.0.0
