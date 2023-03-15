@@ -6,6 +6,7 @@
 int main()
 {
     //hw
+    //ghjkl
 std::string name = "";
 std::string time = "";
 std::string adj1="";
