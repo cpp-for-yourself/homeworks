@@ -5,6 +5,7 @@
 #include <array>
 int main()
 {
+    //hw
 std::string name = "";
 std::string time = "";
 std::string adj1="";
