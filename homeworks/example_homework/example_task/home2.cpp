@@ -36,7 +36,7 @@ int main()
        else if(guess < random_num)
       {
         cout << "\n Your number is too small. Try again!";
-        ++counter;
+        ++counter;//counter variable
         
       }
       else 
